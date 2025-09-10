@@ -1,0 +1,236 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8' /><meta name='viewport' content='width=device-width, initial-scale=1' /><title>Bulk Order (6+)</title>
+  <style>
+    :root{--bg:#f7f7fb;--card:#fff;--text:#1f2937;--muted:#64748b;--accent:#0ea5e9;--ok:#10b981;--bad:#ef4444;}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0}
+    .container{max-width:860px;margin:32px auto;padding:16px}
+    .card{background:var(--card);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:24px}
+    h1{margin:0 0 8px;font-size:1.9rem}
+    h2{margin:0 0 6px;font-size:1.4rem}
+    p.sub{margin:0 0 16px;color:var(--muted)}
+    label{display:block;font-weight:600;margin:8px 0 6px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff}
+    textarea{min-height:120px;resize:vertical}
+    button{margin-top:12px;background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .btn{display:inline-block;margin-top:12px;background:var(--accent);color:#fff;text-decoration:none;padding:12px 18px;border-radius:12px;font-weight:700}
+    .row{display:grid;gap:12px}
+    @media(min-width:640px){.row.two{grid-template-columns:1fr 1fr}}
+    .hidden{display:none}
+    .note{font-size:12px;color:var(--muted);margin-top:8px}
+    .success{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;padding:10px;border-radius:10px;margin-top:10px}
+    .error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:10px;border-radius:10px;margin-top:10px}
+    nav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+    nav a{display:inline-block;text-decoration:none;background:#e2f2fd;padding:8px 12px;border-radius:10px;color:#0b4e6d;font-weight:600}
+    .footer{font-size:12px;color:#64748b;margin-top:24px}
+    .center{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  </style>
+</head><body onload="setBackLinks()">
+  <div class='container'>
+    <div class='card'>
+      <h1>Bulk Order (6+ Keychains)</h1>
+      <p class='sub'>Tell us what you need—quantities, deadlines, customization—and we’ll reply with a quote.</p>
+      <nav><a href='./index.html'>Home</a><a href='./order.html'>Single/Small Orders</a><a href='./contact.html'>Write to Us</a></nav>
+
+      <form id='bulkForm' novalidate>
+        <div class='row two'>
+          <div><label for='bulkName'>Full name *</label><input id='bulkName' name='bulkName' type='text' required /></div>
+          <div><label for='bulkEmail'>Email *</label><input id='bulkEmail' name='bulkEmail' type='email' required /></div>
+        </div>
+
+        <div class='row two'>
+          <div><label for='bulkPhone'>Phone *</label><input id='bulkPhone' name='bulkPhone' type='tel' required /></div>
+          <div><label for='bulkQuantity'>Estimated quantity *</label><input id='bulkQuantity' name='bulkQuantity' type='number' min='6' required /></div>
+        </div>
+
+        <label for='engraveType'>Engraving type *</label>
+        <select id='engraveType' required>
+          <option value='name'>Name only</option>
+          <option value='emoji'>Name + Emoji</option>
+          <option value='photo'>Photo engraving</option>
+          <option value='mixed'>Mixed (multiple types)</option>
+        </select>
+
+        <label for='namesList'>Names list (one per line)</label>
+        <textarea id='namesList' placeholder='e.g.,\nAva\nNoah\nLiam'></textarea>
+
+        <div id='emojiPrefs' class='hidden'>
+          <label for='emojiTheme'>Emoji theme</label>
+          <select id='emojiTheme'>
+            <option value='⭐'>Star ⭐</option>
+            <option value='⚽'>Soccer ⚽</option>
+            <option value='🏀'>Basketball 🏀</option>
+            <option value='🐾'>Paw 🐾</option>
+            <option value='🐶'>Dog 🐶</option>
+            <option value='🐱'>Cat 🐱</option>
+            <option value='🎓'>Graduation 🎓</option>
+            <option value='🩺'>Doctor 🩺</option>
+            <option value='⚙️'>Engineer ⚙️</option>
+            <option value='🎵'>Music 🎵</option>
+            <option value='custom'>Custom (describe below)</option>
+          </select>
+          <label for='emojiCustom'>Custom emoji description</label>
+          <input id='emojiCustom' type='text' placeholder='e.g., School mascot bulldog'/>
+        </div>
+
+        <div id='photoLinksBox' class='hidden'>
+          <label for='photoLinks'>Photo link(s)</label>
+          <textarea id='photoLinks' placeholder='Paste links (Google Drive/Dropbox/etc.), one per line'></textarea>
+        </div>
+
+        <div class='row two'>
+          <div>
+            <label for='deadline'>Desired delivery date *</label>
+            <input id='deadline' type='date' required />
+          </div>
+          <div>
+            <label for='budget'>Budget (optional)</label>
+            <input id='budget' type='text' placeholder='$' />
+          </div>
+        </div>
+
+        <label for='bulkDetails'>Order details *</label>
+        <textarea id='bulkDetails' name='bulkDetails' required placeholder='Customization (names, emoji/themes), delivery date, material (Maple), etc.'></textarea>
+
+        <label for='fulfillment'>Pickup / Delivery *</label>
+        <select id='fulfillment' required>
+          <option value='pickup'>Pickup — ready same day</option>
+          <option value='austin_next'>Within Austin — Next Day (Free)</option>
+          <option value='austin_same'>Within Austin — Same Day (+$5)</option>
+          <option value='shipping_us'>Ship across U.S. — Flat $2.99</option>
+        </select>
+        <p class='note'>Austin deliveries: next day is free, same day is $5. U.S. shipping is flat $2.99.</p>
+
+        <div id='addressGroup' class='hidden'>
+          <div class='row two'>
+            <div><label for='addr1'>Address line 1 *</label><input id='addr1' type='text' /></div>
+            <div><label for='addr2'>Address line 2 (optional)</label><input id='addr2' type='text' /></div>
+          </div>
+          <div class='row two'>
+            <div><label for='city'>City *</label><input id='city' type='text' /></div>
+            <div><label for='state'>State *</label><input id='state' type='text' maxlength='2' placeholder='TX' /></div>
+          </div>
+          <div class='row two'>
+            <div><label for='zip'>ZIP code *</label><input id='zip' type='text' /></div>
+            <div></div>
+          </div>
+        </div>
+
+        <button type='submit'>Send Request</button>
+        <div id='status' aria-live='polite'></div>
+      </form>
+
+      <div id="successScreen" class="center hidden">
+        <h2>Thank you!</h2>
+        <p>Your bulk order request is now processing. We will reach out to you shortly.</p>
+        <a class="btn" href="./index.html">Back to Forms Home</a>
+        <a class="btn back-canva" target="_blank" rel="noopener">Back to Grit Over Grades ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Config ===
+    // Formspree endpoints (already set)
+    const FORM_ENDPOINTS = {
+      order: "https://formspree.io/f/xkgvybab",
+      bulk: "https://formspree.io/f/xvgblrnq",
+      broadcast: "https://formspree.io/f/xwpnybjn",
+      contact: "https://formspree.io/f/xrbajkvy"
+    };
+    // Set this to your Canva site URL for the "Back to Grit Over Grades" button.
+    const CANVA_SITE_URL = "https://gritovergrades.com"; // <-- replace with your actual Canva site link
+
+    function setBackLinks() {
+      document.querySelectorAll('.back-canva').forEach(a => a.href = CANVA_SITE_URL);
+    }
+
+    async function sendToFormspree(kind, payload){
+      const url = FORM_ENDPOINTS[kind];
+      if(!url) throw new Error("Formspree endpoint missing for: " + kind);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Accept":"application/json", "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        let msg = "Submission failed.";
+        try{ const j = await res.json(); if(j && j.errors && j.errors.length){ msg = j.errors.map(e=>e.message).join("; "); } }catch{}
+        throw new Error(msg + " (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    }
+  </script>
+
+  <script>
+    const form=document.getElementById('bulkForm'),statusBox=document.getElementById('status');
+const engraveType = document.getElementById('engraveType');
+const emojiPrefs = document.getElementById('emojiPrefs');
+const emojiTheme = document.getElementById('emojiTheme');
+const emojiCustom = document.getElementById('emojiCustom');
+const namesList = document.getElementById('namesList');
+const photoLinksBox = document.getElementById('photoLinksBox');
+const photoLinks = document.getElementById('photoLinks');
+
+function updateTypeUI(){
+  const t = engraveType.value;
+  emojiPrefs.classList.toggle('hidden', !(t==='emoji' || t==='mixed'));
+  photoLinksBox.classList.toggle('hidden', !(t==='photo' || t==='mixed'));
+}
+engraveType.addEventListener('change', updateTypeUI); updateTypeUI();
+
+    const fulfillmentEl=document.getElementById('fulfillment'),addressGroup=document.getElementById('addressGroup'),addr1=document.getElementById('addr1'),city=document.getElementById('city'),state=document.getElementById('state'),zip=document.getElementById('zip');
+    const successScreen = document.getElementById('successScreen');
+
+    function updateFulfillment(){const e=fulfillmentEl.value,t='pickup'!==e;addressGroup.classList.toggle('hidden',!t),addr1.required=t,city&&(city.required=t),state&&(state.required=t),zip&&(zip.required=t)}
+    function deliveryFee(e){return'pickup'===e?0:'austin_next'===e?0:'austin_same'===e?5:'shipping_us'===e?2.99:0}
+    fulfillmentEl.addEventListener('change',updateFulfillment),updateFulfillment();
+
+    form.addEventListener('submit',async e=>{
+      e.preventDefault(),statusBox.className='',statusBox.textContent='';
+      const name=document.getElementById('bulkName').value.trim(), email=document.getElementById('bulkEmail').value.trim(), phone=document.getElementById('bulkPhone').value.trim(), qty=parseInt(document.getElementById('bulkQuantity').value||'0',10), details=document.getElementById('bulkDetails').value.trim();
+      const map={pickup:'Pickup — same day ready',austin_next:'Austin — Next Day (Free)',austin_same:'Austin — Same Day (+$5)',shipping_us:'U.S. Shipping ($2.99 flat)'}, fulfillLabel=map[fulfillmentEl.value]||'Pickup';
+      if(!name||!email||!phone||!qty||!details){ statusBox.className='error'; statusBox.textContent='Please fill out all required fields.'; return; }
+      const needsAddress=('pickup'!==fulfillmentEl.value); let address=null;
+      if(needsAddress){ if(!addr1.value.trim()||!city.value.trim()||!state.value.trim()||!zip.value.trim()){ statusBox.className='error'; statusBox.textContent='Please complete the address for delivery/shipping.'; return; }
+        address={ line1:addr1.value.trim(), line2:(document.getElementById('addr2').value||'').trim(), city:city.value.trim(), state:state.value.trim(), zip:zip.value.trim() }; }
+      const fee = deliveryFee(fulfillmentEl.value);
+      const payload={ form:'bulk', to:'ponugotibiz@gmail.com', customer_name:name, customer_email:email, phone:phone, quantity:qty, details:details, fulfillment:fulfillLabel, address:address, delivery_fee:fee };
+      try{ await sendToFormspree('bulk', payload); form.classList.add('hidden'); successScreen.classList.remove('hidden'); }
+      catch(err){ statusBox.className='error'; statusBox.textContent='Could not submit: '+err.message; }
+    });
+  </script>
+
+  <script>
+    // === Config ===
+    // Formspree endpoints (already set)
+    const FORM_ENDPOINTS = {
+      order: "https://formspree.io/f/xkgvybab",
+      bulk: "https://formspree.io/f/xvgblrnq",
+      broadcast: "https://formspree.io/f/xwpnybjn",
+      contact: "https://formspree.io/f/xrbajkvy"
+    };
+    // Set this to your Canva site URL for the "Back to Grit Over Grades" button.
+    const CANVA_SITE_URL = "https://gritovergrades.com"; // <-- replace with your actual Canva site link
+
+    function setBackLinks() {
+      document.querySelectorAll('.back-canva').forEach(a => a.href = CANVA_SITE_URL);
+    }
+
+    async function sendToFormspree(kind, payload){
+      const url = FORM_ENDPOINTS[kind];
+      if(!url) throw new Error("Formspree endpoint missing for: " + kind);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Accept":"application/json", "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        let msg = "Submission failed.";
+        try{ const j = await res.json(); if(j && j.errors && j.errors.length){ msg = j.errors.map(e=>e.message).join("; "); } }catch{}
+        throw new Error(msg + " (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    }
+  </script>
+</body></html>

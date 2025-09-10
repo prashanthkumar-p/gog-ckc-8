@@ -1,0 +1,133 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8' /><meta name='viewport' content='width=device-width, initial-scale=1' /><title>Join Our Broadcast List</title>
+  <style>
+    :root{--bg:#f7f7fb;--card:#fff;--text:#1f2937;--muted:#64748b;--accent:#0ea5e9;--ok:#10b981;--bad:#ef4444;}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0}
+    .container{max-width:860px;margin:32px auto;padding:16px}
+    .card{background:var(--card);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:24px}
+    h1{margin:0 0 8px;font-size:1.9rem}
+    h2{margin:0 0 6px;font-size:1.4rem}
+    p.sub{margin:0 0 16px;color:var(--muted)}
+    label{display:block;font-weight:600;margin:8px 0 6px}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:10px;font-size:16px;background:#fff}
+    textarea{min-height:120px;resize:vertical}
+    button{margin-top:12px;background:var(--accent);color:#fff;border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .btn{display:inline-block;margin-top:12px;background:var(--accent);color:#fff;text-decoration:none;padding:12px 18px;border-radius:12px;font-weight:700}
+    .row{display:grid;gap:12px}
+    @media(min-width:640px){.row.two{grid-template-columns:1fr 1fr}}
+    .hidden{display:none}
+    .note{font-size:12px;color:var(--muted);margin-top:8px}
+    .success{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;padding:10px;border-radius:10px;margin-top:10px}
+    .error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;padding:10px;border-radius:10px;margin-top:10px}
+    nav{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+    nav a{display:inline-block;text-decoration:none;background:#e2f2fd;padding:8px 12px;border-radius:10px;color:#0b4e6d;font-weight:600}
+    .footer{font-size:12px;color:#64748b;margin-top:24px}
+    .center{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  </style>
+</head><body onload="setBackLinks()">
+  <div class='container'>
+    <div class='card'>
+      <h1>Join Our Broadcast List</h1>
+      <p class='sub'>Receive updates, offers, and new product launches.</p>
+      <nav><a href='./index.html'>Home</a><a href='./order.html'>Order a Keychain</a><a href='./contact.html'>Write to Us</a></nav>
+
+      <form id='broadcastForm' novalidate>
+        <label for='bName'>Full name *</label>
+        <input id='bName' name='bName' type='text' required />
+        <div class='row two'>
+          <div><label for='bEmail'>Email</label><input id='bEmail' name='bEmail' type='email' placeholder='Optional if providing phone' /></div>
+          <div><label for='bPhone'>Phone</label><input id='bPhone' name='bPhone' type='tel' placeholder='Optional if providing email' /></div>
+        </div>
+        <button type='submit'>Join List</button>
+        <div id='status' aria-live='polite'></div>
+      </form>
+
+      <div id="successScreen" class="center hidden">
+        <h2>Thank you for joining!</h2>
+        <p>Your subscription is confirmed. We will reach out to you shortly.</p>
+        <a class="btn" href="./index.html">Back to Forms Home</a>
+        <a class="btn back-canva" target="_blank" rel="noopener">Back to Grit Over Grades ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Config ===
+    // Formspree endpoints (already set)
+    const FORM_ENDPOINTS = {
+      order: "https://formspree.io/f/xkgvybab",
+      bulk: "https://formspree.io/f/xvgblrnq",
+      broadcast: "https://formspree.io/f/xwpnybjn",
+      contact: "https://formspree.io/f/xrbajkvy"
+    };
+    // Set this to your Canva site URL for the "Back to Grit Over Grades" button.
+    const CANVA_SITE_URL = "https://gritovergrades.com"; // <-- replace with your actual Canva site link
+
+    function setBackLinks() {
+      document.querySelectorAll('.back-canva').forEach(a => a.href = CANVA_SITE_URL);
+    }
+
+    async function sendToFormspree(kind, payload){
+      const url = FORM_ENDPOINTS[kind];
+      if(!url) throw new Error("Formspree endpoint missing for: " + kind);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Accept":"application/json", "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        let msg = "Submission failed.";
+        try{ const j = await res.json(); if(j && j.errors && j.errors.length){ msg = j.errors.map(e=>e.message).join("; "); } }catch{}
+        throw new Error(msg + " (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    }
+  </script>
+
+  <script>
+    const form=document.getElementById('broadcastForm'),statusBox=document.getElementById('status');
+    const successScreen=document.getElementById('successScreen');
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault(); statusBox.className=''; statusBox.textContent='';
+      const name=document.getElementById('bName').value.trim(), email=document.getElementById('bEmail').value.trim(), phone=document.getElementById('bPhone').value.trim();
+      if(!name || (!email && !phone)){ statusBox.className='error'; statusBox.textContent='Please provide name and at least one contact: email or phone.'; return; }
+      const payload={ form:'broadcast', to:'ponugotibiz@gmail.com', name:name, email:email||null, phone:phone||null };
+      try{ await sendToFormspree('broadcast', payload); form.classList.add('hidden'); successScreen.classList.remove('hidden'); }
+      catch(err){ statusBox.className='error'; statusBox.textContent='Could not submit: '+err.message; }
+    });
+  </script>
+
+  <script>
+    // === Config ===
+    // Formspree endpoints (already set)
+    const FORM_ENDPOINTS = {
+      order: "https://formspree.io/f/xkgvybab",
+      bulk: "https://formspree.io/f/xvgblrnq",
+      broadcast: "https://formspree.io/f/xwpnybjn",
+      contact: "https://formspree.io/f/xrbajkvy"
+    };
+    // Set this to your Canva site URL for the "Back to Grit Over Grades" button.
+    const CANVA_SITE_URL = "https://gritovergrades.com"; // <-- replace with your actual Canva site link
+
+    function setBackLinks() {
+      document.querySelectorAll('.back-canva').forEach(a => a.href = CANVA_SITE_URL);
+    }
+
+    async function sendToFormspree(kind, payload){
+      const url = FORM_ENDPOINTS[kind];
+      if(!url) throw new Error("Formspree endpoint missing for: " + kind);
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Accept":"application/json", "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok){
+        let msg = "Submission failed.";
+        try{ const j = await res.json(); if(j && j.errors && j.errors.length){ msg = j.errors.map(e=>e.message).join("; "); } }catch{}
+        throw new Error(msg + " (HTTP " + res.status + ")");
+      }
+      return await res.json();
+    }
+  </script>
+</body></html>
